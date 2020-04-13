@@ -23,8 +23,8 @@ module Google
         @signed = "#{segments[0]}.#{segments[1]}"
         @signature = segments[2]
 
-        @envelope = JSON.parse Base64.decode64(segments[0])
-        @payload = JSON.parse Base64.decode64(segments[1])
+        @envelope = JSON.parse Base64.urlsafe_decode64(segments[0])
+        @payload = JSON.parse Base64.urlsafe_decode64(segments[1])
       end
 
       def validate max_expiry = MAX_TOKEN_LIFETIME_SECONDS
