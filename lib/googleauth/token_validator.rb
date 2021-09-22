@@ -33,7 +33,10 @@ module Google
         end
 
         unless self.class._certs.keys.include? @envelope["kid"]
-          fail Error, "No matching Google cert found for envelope: #{@envelope}"
+          self.class._update_certs
+          unless self.class._certs.keys.include? @envelope["kid"]
+            fail Error, "No matching Google cert found for envelope: #{@envelope}"
+          end
         end
 
         pem = self.class._certs[envelope["kid"]]
@@ -79,6 +82,13 @@ module Google
 
         def _certs
           @_cached_certs ||= begin
+            uri = URI(GOOGLE_SIGNON_CERTS_URL)
+            JSON.parse Net::HTTP.get(uri)
+          end
+        end
+
+        def _update_certs
+          @_cached_certs = begin
             uri = URI(GOOGLE_SIGNON_CERTS_URL)
             JSON.parse Net::HTTP.get(uri)
           end
